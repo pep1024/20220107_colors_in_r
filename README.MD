@@ -10,7 +10,7 @@ can be obtained with function `colors()` (equivalently, `colours()`). My goal
 in this project was to create a picture where all named colors can be
 grasped together. This is the final picture:
 
-![](all_R_named_colors_plot.png){dpi=96}
+![](all_R_named_colors_plot.png)
 
 The code to generate it can be found in the file 
 [all_colors_plot.R](https://github.com/pep1024/20220107_colors_in_r/blob/main/all_colors_plot.R).
