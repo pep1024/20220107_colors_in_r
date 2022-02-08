@@ -1,0 +1,90 @@
+---
+title: "Show images in Rmarkdown documents"
+author: "Pep Porrà"
+date: "2022-01-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal
+
+Play with the options to show images in a RMarkdown document
+
+## Reference
+
+This analysis is based on the blog post by ZevRoss [link](http://zevross.com/blog/2017/06/19/tips-and-tricks-for-working-with-images-and-figures-in-r-markdown-documents/)
+
+## Set-up
+
+```{r}
+library(magick)
+library(tidyverse)
+```
+
+## Data
+
+We will use a PNG image [GitHb]() I created to view all named R colors, 657 in total, and a plot generated with R package {ggplot2}
+
+### Image
+
+```{r}
+im1 <- magick::image_read("all_R_named_colors_plot.png")
+image_info(im1)
+```
+
+``` r
+knitr::include_graphics("all_R_named_colors_plot.png")
+```
+
+Note that, in the viewer pane, the image has better resolution than in the Rmarkdown doc.
+The reason is that once the doc in knitted, dpi is set to the default of knit (72) instead
+of the 96 dpi it had originally. 
+
+If we change dpi to 96 with `dpi = 96` within function `include_graphics`, the results (pane and knitted doc) are the same
+
+
+```{r}
+knitr::include_graphics("all_R_named_colors_plot.png", dpi = 96)
+```
+
+In the case of the plot, both images (Rmarkdown -pane- and knit) look like the same.
+
+```{r}
+(plot1 <- ggplot(cars, aes(speed, dist)) + geom_point())
+```
+
+Using `fig.width = 5` in the R chunk properties only changes figures and 
+not images size
+
+<!--
+```{r, fig.width=5}
+knitr::include_graphics("all_R_named_colors_plot.png", dpi = 96)
+```
+-->
+
+```{r, fig.width=5}
+plot1
+```
+
+To change image size, we can use `out.width` given in % or px (pixels). 
+The image is obtained with `out.width = "30%"` and the figure with 
+`out.width="200px"`
+
+```{r, out.width="30%"}
+knitr::include_graphics("all_R_named_colors_plot.png", dpi = 96)
+```
+
+```{r, out.width="200px"}
+plot1
+```
+
+Also, for images, we can use Markdown 
+
+``` r
+![](all_R_named_colors_plot.png){width=50%}
+```
+
+![](all_R_named_colors_plot.png){width=50%}

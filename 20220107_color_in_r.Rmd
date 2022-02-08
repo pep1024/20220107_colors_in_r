@@ -1,0 +1,289 @@
+---
+title: "Colors in R"
+author: "Pep Porrà"
+date: "2022-01-07"
+output: 
+  html_document:
+    df_print: paged
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+```{r}
+library(tidyverse)
+library(scales)
+library(DT)
+library(ggplot2)
+```
+
+
+```{r}
+r_colors_list <- function(){
+  color_list <- colors()
+
+  rgb_channels <-  as_tibble(t(col2rgb(color_list)))
+
+  color_df <- tibble(id = 1:length(color_list), name = color_list, 
+    hex = rgb(t(col2rgb(color_list)), maxColorValue = 255))
+  color_df <- color_df |> 
+    bind_cols(rgb_channels)
+  return(color_df)
+}
+
+find_color <- function(pattern = NULL){
+  color_df <- r_colors_list()
+  if (is.null(pattern)) {
+    ans <- color_df
+  } else {
+    ans <- color_df[str_which(color_df$name, pattern), ]
+  }
+  return(ans)
+}
+
+color_view <-  function(n0 = 1){
+  
+  stopifnot(n0 >= 1, n0 <= 657)
+  # previous color
+  previous_color  <-  n0 - 1
+  
+  # Settings
+  line <- 10
+  col <- 10
+  
+  # No margin around chart
+  old_par <- par(mar=c(0,0,0,0), 
+    xaxs = 'i', yaxs = 'i', no.readonly = TRUE)
+  
+  # Empty chart
+  plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1), 
+    axes = FALSE,
+    xlab = "", ylab = "", )
+  
+  axis_color <- "gray25"
+  x_axis_pos <- - 1 / col / 2 + c(0.1, 0.5, 1)
+  axis(3, at = x_axis_pos, labels = c(1, 5, 10), col = axis_color,
+    col.axis = axis_color, cex.axis = 0.7, tcl = -0.2, mgp = c(3,0.5,0))
+  y_axis_pos <- 1 - (1/line/2 + c(1, seq(5, 65, by = 5)) / line)
+  axis(2, at = y_axis_pos, 
+    labels = 10 * c(1, seq(5, 65, by = 5)), las = 2, col = axis_color,
+    col.axis = axis_color, cex.axis = 0.7, tcl = -0.2, mgp = c(3,0.5,0))
+  
+  # circular sequence
+  seq_col <- seq(1,line*col) + previous_color
+  seq_col <- sapply(seq_col, function(x) ifelse(x > 657, x %% 657, x))
+  
+  # rect dimensions
+  xl <- rep((0:(col - 1)/col),line)
+  yb <- sort(rep((0:(line - 1)/line), col), decreasing=T)
+  xr <- rep((1:col/col),line) 
+  yt <- sort(rep((1:line/line), col),decreasing=T)
+  
+  # Add color background
+  rect(  
+    xl, yb, xr, yt,
+    border = "white" , 
+    col=colors()[seq_col])
+  
+  # text position
+  x_text <- (xl + xr) / 2
+  y_text <- (yb + yt) / 2
+  
+  # Color names
+  text(  
+    x_text, y_text, adj = c(0.5, 0.5),
+    colors()[seq_col], 
+    cex=0.7)
+  title(main = "Named colors in R", adj = 0, line = 2)
+  par(old_par)
+}
+
+show_n_colors <- function(colors, rgb_matrix = FALSE, ...){
+
+  old_par <- par(mar=c(0,0,0,0),  no.readonly = TRUE)
+  
+  # Empty chart
+ 
+  if (!rgb_matrix) {
+    ddf <-  t(col2rgb(colors))
+    hex_col <-  rgb(ddf, maxColorValue = 255)
+  } else {
+    hex_col <- rgb(colors, maxColorValue = 255)
+  }
+  
+  n_colors <- length(hex_col)
+  # https://stackoverflow.com/a/25726442/6679066
+  
+  image(1:n_colors, 1, as.matrix(1:n_colors), 
+      col=hex_col,
+      xlab="", ylab = "", axes = FALSE, ann =FALSE, bty = "n", ...)
+  
+  par(old_par)
+}
+
+show_one_color <- function(hex_col, ...){
+
+  old_par <- par(fin = c(0.5, 0.5), mar=c(0,0,0,0),  no.readonly = TRUE)
+  
+  plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1), 
+    axes = FALSE,
+    xlab = "", ylab = "", )
+  rect(  
+    0,0,1,1,
+    border = "white" , 
+    col=hex_col)
+  
+  par(old_par)
+}
+```
+
+
+## Goal
+
+1. Show named colors in R
+2. base functions to create a color palette
+
+## Colors
+
+All 657 colors with name in R
+
+```{r, echo = TRUE}
+r_colors_list()
+```
+
+```{r}
+DT::datatable(r_colors_list())
+```
+
+```{r, echo = FALSE, eval = FALSE}
+show_col(r_colors_list()$name, labels = FALSE, ncol = 50)
+```
+
+```{r}
+knitr::include_graphics("all_R_named_colors_plot.png", dpi = 96)
+```
+
+
+## Visualization
+
+Visualization of sequential 100 colors starting at color n0. Based on
+[R-gallery](https://www.r-graph-gallery.com/42-colors-names.html )
+
+```{r}
+# numericInput("first_color", "Which is the first color (1:657)?", rdunif(1, 657))
+sliderInput("first_color", "What value interpolate?", value = rdunif(1, 657),
+  min = 1, max = 657, step = 1, ticks = FALSE)
+
+n0 <- reactive(as.numeric(input$first_color))
+renderPlot({
+  color_view(n0())
+})
+
+```
+
+## Find a color by name
+
+Find all colors that contain a given pattern in the name
+
+```{r}
+textInput("pattern", "Which word to find in color names?", value = "white")
+blue_in_name <- reactive(find_color(input$pattern))
+
+h4("Show in row form")
+renderPlot(show_n_colors(blue_in_name()$name), height = 100)
+
+br()
+h4("All values")
+DT::renderDataTable(blue_in_name())
+
+#WE do not use show_col
+#br()
+#h4("Show in table form")
+#renderPlot(show_col(blue_in_name()$name, cex_label = 0.8, ncol = 5), height = 300)
+```
+
+## Palette
+
+We first use `colorRamp()`. It returns a function that has as a parameter a value
+between 0 (which returns the first color) and 1 (returns the second/last color).
+n values between 0 and 1 returns a palette that interpolates between the two
+(or more) colors passed as arguments to `colorRamp()`. Pick two or more colors
+and `colorRamp()` will return a function that interpolates between each of the 
+colors. Note that the order the colors are picked matters. Moving the slider
+between 0 and 1 we can explore the palette.
+
+```{r}
+shiny::selectInput("base_colors", "Pick two o more colors to interpolate", 
+  choices = colors(), multiple = TRUE)
+
+h4("colorRamp() function")
+sliderInput("fraction", "What value interpolate?", value = 0.5,
+  min = 0, max = 1)
+shiny::actionButton("colorramp", label = "Interpolate a color",
+  class = "btn-info")
+
+br()
+
+color_gen <- eventReactive(input$colorramp, {
+  rgb(colorRamp(input$base_colors)(as.numeric(input$fraction)), 
+    maxColorValue = 255)
+})
+
+
+h4("Color generated by colorRamp()")
+
+shiny::renderPlot(
+  show_one_color(color_gen()), height = 50
+)
+shiny::renderText(
+  paste0("\'", color_gen(), "\'")
+)
+
+## If two or more colors are picked run the interpolation
+## If 0 or 1 colors picked: Warning message
+
+h4("colorRampPalette() function")
+sliderInput("n_colors", "number of colors", value = 5,
+  min = 1, max = 20, step = 1, ticks = FALSE)
+shiny::actionButton("colorramppalette", label = "Create palette",
+  class = "btn-info")
+
+
+
+## If two or more colors are picked create the palette
+## If 0 or 1 colors picked: Warning message
+br()
+#h4("Show in table form")
+
+n <- eventReactive(input$colorramppalette, {
+  colorRampPalette(input$base_colors)(as.numeric(input$n_colors))
+})
+
+
+h4("Palette generated by colorRampPalette()")
+
+shiny::renderPlot(
+  show_n_colors(n()), height = 50
+)
+
+p("copy/paste the result shown to create your palette")
+
+shiny::renderText(
+  paste0("c(\'", paste(n(), collapse = "\',\'"), "\')")
+)
+
+```
+
+
+## References
+
+* [R graphics, P. Murrell](https://www.amazon.com/Graphics-Third-Chapman-Hall-CRC/dp/0367780690) Chapter 10 Section on colors
+* [Colorspace package](http://colorspace.r-forge.r-project.org/articles/colorspace.html) Reference to explore color palettes
+* [Colors in R](http://derekogle.com/NCGraphing/resources/colors)
+* [The paletteer gallery](https://pmassicotte.github.io/paletteer_gallery/#Discrete_palettes)
+* [Exploratory Data Analysis in R (R. Peng)](https://bookdown.org/rdpeng/exdata/plotting-and-color-in-r.html)
+* [HCLwizard](https://hclwizard.org/) Software to develop palettes
+* [Farver R package](https://farver.data-imaginist.com/) Conversion of colors between different color spaces
