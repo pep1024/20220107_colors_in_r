@@ -19,14 +19,15 @@ This analysis is based on the blog post by ZevRoss [link](http://zevross.com/blo
 
 ## Set-up
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+options(tidyverse.quiet = TRUE)
 library(magick)
 library(tidyverse)
 ```
 
 ## Data
 
-We will use a PNG image [GitHb]() I created to view all named R colors, 657 in total, and a plot generated with R package {ggplot2}
+I will use the PNG image I created to view all named R colors, 657 in total, in  [GitHub](https://github.com/pep1024/20220107_colors_in_r/blob/main/all_R_named_colors_plot.png) and a plot generated with R package {ggplot2}
 
 ### Image
 

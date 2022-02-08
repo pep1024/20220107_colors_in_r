@@ -71,11 +71,13 @@ all_colors_plot <- function(){
   
   # title and other decorations
   
-  title(main = "All 657 named colors in R", adj = 0, line = 2)
+  title(main = "All 657 built-in named colors in R", adj = 0, line = 2)
   mtext("n=x+y coordinates gives the color index in colors() vector", 
     line = 0, side = 1, adj = 0, cex = 0.8, col = axis_color)
   mtext("For instance, for x=140 and y=4, n=144 and colors()[144]=='gold2'",
     line = 1, side = 1, adj = 0, cex = 0.8, col = axis_color)
+  mtext("https://github.com/pep1024/20220107_colors_in_r", line = 0, side = 1, adj = 1,
+    cex = 0.8, col = axis_color)
   mtext("2022-01-11 josepmporra@gmail.com", line = 1, side = 1, adj = 1,
     cex = 0.8, col = axis_color)
   par(old_par)

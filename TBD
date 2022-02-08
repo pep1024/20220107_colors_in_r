@@ -1,19 +1,19 @@
 2022-01-07
 
 1. Shiny App
-2. Create palette between two colors
-3. Create a palette
+2. Create palette between two colors **DONE**
+3. Create a palette **DONE**
 4. All functions in a package
 
 2022-01-30
 
-1. Add the link to github images in show_images.Rmd and README.md
-2. git init locally
-3. Create remote repo in pep1024 github
-4. Upload show_images.Rmd to Rpub
+1. Add the link to github images in show_images.Rmd and README.md **DONE**
+2. git init locally **DONE**
+3. Create remote repo in pep1024 github **DONE**
+4. Upload show_images.Rmd to Rpub **DONE**
 5. Create Shiny with 20220107_color_in_R
 6. Upload this Shiny web to shiny.io
-7. Add link to github in the image
+7. Add link to github in the image **DONE**
 8. Save image in PDF format
 9. all_color_plot.R: create a function to create the image in PDF and or PNG
 10. Add reference to R graphics book by Murrell (3rd Edition) ** DONE **
