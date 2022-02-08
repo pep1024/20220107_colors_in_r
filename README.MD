@@ -24,7 +24,7 @@ Rmarkdown documents
 1. [Named colors in R Shiny ](link rstudio.io) a simple Shiny page to explore
 all named colors and create palettes with them using functions `colorRamp()` and
 `colorRampPalette()`
-1. [20220107_color_in_r.Rmd](20220107_color_in_r.Rmd) document test the functions
+1. [20220107_color_in_r.Rmd](20220107_color_in_r.Rmd) document to test the functions
 used in the Shiny document above
 
 
