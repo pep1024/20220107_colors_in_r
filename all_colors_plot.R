@@ -1,6 +1,6 @@
 #' Plot all named color in R
 #'
-#' @return Png file with a plot of all 657 named color in R
+#' @return a plot of all 657 built-in named colors in R
 #' @export
 #'
 #' @examples
@@ -58,7 +58,7 @@ all_colors_plot <- function(){
   # hcl <- farver::decode_colour(colors(), "rgb", "hcl")
   # label_col <- ifelse(hcl[, "l"] > 50, "black", 
   #   "white")
-  # Based on R graphics by P. Murell
+  # Based on comment in R graphics by P. Murell
   huv <- convertColor(
     t(col2rgb(colors())/255), "sRGB", "Luv")
   label_col <- ifelse(huv[, "L"] > 50, "black", 
@@ -83,12 +83,37 @@ all_colors_plot <- function(){
   par(old_par)
 }
 
-file_name <- "all_R_named_colors_plot.png"
-if(!file.exists(file_name)) {
-  png(file_name, 
-    width = 1200, height = 1200, units = "px", res = 96)
-  all_colors_plot()
-  dev.off()
-} else {
-  message(paste0("File: ", file_name, " Already exists"))
+#' create a file (png or pdf) with all R named colors
+#'
+#' @param name Name of the file without extension. Default is "all_R_named_colors_plot"
+#' @param format Pick png (default) or pdf
+#' @param overwrite TRUE if we want to overwrite the file if it exist. default: FALSE
+#' @param ... other parametrs passed to png() or pdf()
+#' 
+#' @return 1 if successful 0 if fail
+#' @export
+#'
+#' @examples
+create_file_all_colors <-  function(name = "all_R_named_colors_plot", 
+  format = c("png", "pdf"), 
+  overwrite = FALSE, ...){
+  
+  # type of file
+  file_type <- match.arg(format)
+  
+  # file_name
+  file_name <- paste0(name,".", file_type) 
+  
+  if(!file.exists(file_name) || overwrite) {
+    switch(file_type,
+      png = png(file_name, 
+        width = 1200, height = 1200, units = "px", res = 96),
+      pdf = pdf(file_name, paper = "a4", pointsize = 8))
+    all_colors_plot()
+    dev.off()
+  } else {
+    message(paste0("File: ", file_name, " Already exists"))
+  }  
+  
 }
+
